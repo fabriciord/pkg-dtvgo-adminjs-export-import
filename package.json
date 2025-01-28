@@ -1,0 +1,27 @@
+{
+  "name": "pkg-dtvgo-adminjs-export-import",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js"
+    }
+  },
+  "private": true,
+  "repository": "",
+  "license": "",
+  "scripts": {
+    "lint": "eslint './lib/**/*'"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "peerDependencies": {
+    "adminjs": "^7.8.8"
+  },
+  "dependencies": {
+    "file-saver": "^2.0.5"
+  }
+}
