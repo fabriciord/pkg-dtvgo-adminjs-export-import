@@ -4,6 +4,7 @@ import { Box, Button, Loader, Text, Table, TableHead, TableBody, TableRow, Table
 import { saveAs } from 'file-saver';
 import format from 'date-fns/format';
 import { Exporters } from '../exporter.type.js';
+import { sortObjectByCustomOrder } from '../utils.js';
 export const mimeTypes = {
     json: 'application/json',
     csv: 'text/csv',
@@ -43,35 +44,6 @@ const ExportComponent = ({ resource, records }) => {
     }
     return (
         <Box>
-            <Box>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            {
-                                records.map(record => {
-                                    const params = Object.keys(record.params);
-                                    return params
-                                        .map(param => <TableCell key={param}>{param}</TableCell>)
-                                        .slice(0, 4);
-                                })[0]
-                            }
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {records.map(({ params }) => {
-                            return (
-                                <TableRow key={params}>
-                                    {Object.values(params)
-                                        .slice(0, 4)
-                                        .map(param => (
-                                            <TableCell key={param}>{param}</TableCell>
-                                        ))}
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </Box>
             <Box display="flex" justifyContent="center">
                 <Text variant="lg">Choose export format:</Text>
             </Box>
@@ -86,6 +58,35 @@ const ExportComponent = ({ resource, records }) => {
                         </Button>
                     </Box>
                 ))}
+            </Box>
+            <Box>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {
+                                records.map((record) => {
+                                    const params = Object.keys(sortObjectByCustomOrder(record.params));
+                                    return params
+                                        .map((param, index) => <TableCell key={`${index}`}>{param}</TableCell>)
+                                        .slice(0, 4);
+                                })[0]
+                            }
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {records.map(({ params }) => {
+                            return (
+                                <TableRow key={params._id}>
+                                    {Object.values(sortObjectByCustomOrder(params))
+                                        .slice(0, 4)
+                                        .map((param, index) => (
+                                            <TableCell key={`${index}`}>{param}</TableCell>
+                                        ))}
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
             </Box>
         </Box>
     );
