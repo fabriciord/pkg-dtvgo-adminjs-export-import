@@ -3,13 +3,7 @@ import { ApiClient, useNotice } from 'adminjs';
 import { Box, Button, Loader, Text, Table, TableHead, TableBody, TableRow, TableCell } from '@adminjs/design-system';
 import { saveAs } from 'file-saver';
 import format from 'date-fns/format';
-import { Exporters } from '../exporter.type.js';
-import { sortObjectByCustomOrder } from '../utils.js';
-export const mimeTypes = {
-    json: 'application/json',
-    csv: 'text/csv',
-    xml: 'text/xml',
-};
+
 export const getExportedFileName = (extension, resourceName) => `export-${resourceName}-${format(Date.now(), 'yyyy-MM-dd_HH-mm')}.${extension}`;
 
 const ExportComponent = ({ resource, records }) => {
@@ -27,10 +21,10 @@ const ExportComponent = ({ resource, records }) => {
                     type,
                 },
                 data: {
-                    records: records.map(r => r.id),
+                    records: records.map(record => record.id),
                 }
             });
-            const blob = new Blob([exportedData], { type: mimeTypes[type] });
+            const blob = new Blob([exportedData], { type: 'application/json' });
             saveAs(blob, getExportedFileName(type, resource.id));
             sendNotice({ message: 'Exported successfully', type: 'success' });
         }
@@ -48,16 +42,14 @@ const ExportComponent = ({ resource, records }) => {
                 <Text variant="lg">Choose export format:</Text>
             </Box>
             <Box display="flex" justifyContent="center">
-                {Exporters.map(parserType => (
-                    <Box key={parserType} m={2}>
+                    <Box m={2}>
                         <Button
-                            onClick={() => exportData(parserType)}
+                            onClick={() => exportData('json')}
                             disabled={isFetching}
                         >
-                            {parserType.toUpperCase()}
+                            {'json'.toUpperCase()}
                         </Button>
                     </Box>
-                ))}
             </Box>
             <Box>
                 <Table>
@@ -65,22 +57,22 @@ const ExportComponent = ({ resource, records }) => {
                         <TableRow>
                             {
                                 records.map((record) => {
-                                    const params = Object.keys(sortObjectByCustomOrder(record.params));
+                                    const params = Object.keys(record.params);
                                     return params
                                         .map((param, index) => <TableCell key={`${index}`}>{param}</TableCell>)
-                                        .slice(0, 4);
+                                        .slice(0, 8);
                                 })[0]
                             }
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {records.map(({ params }) => {
+                        {records.map(({ params }, rowIndex) => {
                             return (
-                                <TableRow key={params._id}>
-                                    {Object.values(sortObjectByCustomOrder(params))
-                                        .slice(0, 4)
+                                <TableRow key={`value-${params._id}-${rowIndex}`}>
+                                    {Object.values(params)
+                                        .slice(0, 8)
                                         .map((param, index) => (
-                                            <TableCell key={`${index}`}>{param}</TableCell>
+                                            <TableCell key={`value-${param}-${index}`}>{param}</TableCell>
                                         ))}
                                 </TableRow>
                             );

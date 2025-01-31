@@ -13,7 +13,7 @@ import {
     TableRow,
     TableCell,
 } from '@adminjs/design-system';
-import { sortObjectByCustomOrder } from '../utils';
+
 const ImportComponent = ({ resource }) => {
     const [file, setFile] = useState(null);
     const [records, setRecords] = useState(null);
@@ -109,8 +109,8 @@ const ImportComponent = ({ resource }) => {
                                 {records[resourceId].map(({ params, relations }, rowIndex) => (
                                     <TableHead key={`head-${resourceId}-${rowIndex}`}>
                                         <TableRow>
-                                            {Object.keys(sortObjectByCustomOrder(params))
-                                                .slice(0, 4)
+                                            {Object.keys(params)
+                                                .slice(0, 8)
                                                 .map((param, index) => (
                                                     <TableCell key={`param-${resourceId}-${param}-${index}`}>{param}</TableCell>
                                                 ))}
@@ -121,8 +121,8 @@ const ImportComponent = ({ resource }) => {
                                 {records[resourceId].map(({ params, relations }, rowIndex) => (
                                     <TableBody key={`body-${resourceId}-${rowIndex}`}>
                                         <TableRow>
-                                            {Object.values(sortObjectByCustomOrder(params))
-                                                .slice(0, 4)
+                                            {Object.values(params)
+                                                .slice(0, 8)
                                                 .map((param, index) => (
                                                     <TableCell key={`value-${resourceId}-${param}-${index}`}>{param}</TableCell>
                                                 ))}

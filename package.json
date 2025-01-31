@@ -8,9 +8,6 @@
     }
   },
   "private": true,
-  "publishConfig": {
-    "access": "restricted"
-  },
   "repository": "",
   "license": "",
   "scripts": {
