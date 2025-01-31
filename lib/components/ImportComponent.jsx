@@ -14,8 +14,18 @@ import {
     TableCell,
 } from '@adminjs/design-system';
 
+export const sortObjectByCustomOrder = (object, array) => {
+    return array
+        .filter(key => key in object)
+        .reduce((acc, key) => {
+            acc[key] = object[key];
+            return acc;
+        }, {});
+}
+
 const ImportComponent = ({ resource }) => {
     const [file, setFile] = useState(null);
+    const [listProperties, setListProperties] = useState([]);
     const [records, setRecords] = useState(null);
     const sendNotice = useNotice();
     const [isFetching, setFetching] = useState();
@@ -27,7 +37,10 @@ const ImportComponent = ({ resource }) => {
         } else {
             setRecords(null)
         }
-    }, [file]);
+        if (resource) {
+            setListProperties(resource.listProperties.sort((a, b) => a.position - b.position).map(p => p.name));
+        }
+    }, [file,resource]);
 
     const onUpload = (uploadedFile) => {
         setFile(uploadedFile?.[0] ?? null);
@@ -109,7 +122,7 @@ const ImportComponent = ({ resource }) => {
                                 {records[resourceId].map(({ params, relations }, rowIndex) => (
                                     <TableHead key={`head-${resourceId}-${rowIndex}`}>
                                         <TableRow>
-                                            {Object.keys(params)
+                                            {Object.keys(sortObjectByCustomOrder(params, listProperties))
                                                 .slice(0, 8)
                                                 .map((param, index) => (
                                                     <TableCell key={`param-${resourceId}-${param}-${index}`}>{param}</TableCell>
@@ -121,7 +134,7 @@ const ImportComponent = ({ resource }) => {
                                 {records[resourceId].map(({ params, relations }, rowIndex) => (
                                     <TableBody key={`body-${resourceId}-${rowIndex}`}>
                                         <TableRow>
-                                            {Object.values(params)
+                                            {Object.values(sortObjectByCustomOrder(params, listProperties))
                                                 .slice(0, 8)
                                                 .map((param, index) => (
                                                     <TableCell key={`value-${resourceId}-${param}-${index}`}>{param}</TableCell>
