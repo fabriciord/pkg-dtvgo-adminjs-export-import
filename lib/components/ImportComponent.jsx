@@ -13,6 +13,7 @@ import {
     TableRow,
     TableCell,
 } from '@adminjs/design-system';
+import { is } from 'date-fns/locale';
 
 const ImportComponent = ({ resource }) => {
     const [file, setFile] = useState(null);
@@ -34,6 +35,7 @@ const ImportComponent = ({ resource }) => {
     };
     reader.onload = (event) => {
         try {
+            setFetching(true);
             const jsonContent = JSON
                 .parse(event.target.result)
                 .reduce((acc, record) => {
@@ -44,8 +46,8 @@ const ImportComponent = ({ resource }) => {
                     acc[resourceId].push(record);
                     return acc;
                 }, []);
-
             setRecords(jsonContent);
+            setFetching(false);
         } catch (error) {
             sendNotice({ message: `Ocorreu um erro ao tentar fazer o upload do arquivo.: ${error.message}`, type: 'error' });
         }
@@ -100,7 +102,8 @@ const ImportComponent = ({ resource }) => {
                     </Button>
                 </Box>
             </Box>
-            <Box>
+            {isFetching && <Loader />}
+            {!isFetching && <Box>
                 {records &&
                     Object.keys(records).map((resourceId) => (
                         <div key={resourceId}>
@@ -138,7 +141,7 @@ const ImportComponent = ({ resource }) => {
                         </div>
                     ))
                 }
-            </Box>
+            </Box>}
         </Box>
     );
 };

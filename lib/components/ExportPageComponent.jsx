@@ -15,7 +15,9 @@ import {
     H1,
     DatePicker,
     Button,
+    Loader
 } from "@adminjs/design-system";
+import { is } from "date-fns/locale";
 
 export const getExportedFileName = (extension, resourceName) => `export-${resourceName}-${format(Date.now(), 'yyyy-MM-dd_HH-mm')}.${extension}`;
 
@@ -34,9 +36,9 @@ const ExportImportComponent = () => {
         setFindResources(findResources => {
             if (findResources.includes(resource)) {
                 const rscs = findResources.filter((item) => item !== resource);
-                    if (rscs.length === 0) {
-                        return ['All'];
-                    }
+                if (rscs.length === 0) {
+                    return ['All'];
+                }
                 return rscs;
             } else {
                 if (resource === 'All') {
@@ -50,7 +52,8 @@ const ExportImportComponent = () => {
     };
     const handleRecordCheckBoxChange = ({ resourceId, params, relations }) => {
         if (selectedRecords[resourceId]) {
-            if (selectedRecords[resourceId].findIndex((record) => record.params === params) !== -1) {;
+            if (selectedRecords[resourceId].findIndex((record) => record.params === params) !== -1) {
+                ;
                 setSelectedRecords({ ...selectedRecords, [resourceId]: selectedRecords[resourceId].filter((record) => record.params !== params) });
             } else {
                 setSelectedRecords({ ...selectedRecords, [resourceId]: [...selectedRecords[resourceId], { resourceId, params, relations }] });
@@ -62,6 +65,7 @@ const ExportImportComponent = () => {
     useEffect(() => {
         const fetchResources = async () => {
             try {
+                setFetching(true);
                 const response = await new ApiClient().getPage({
                     pageName: 'Export',
                     params: {
@@ -73,6 +77,7 @@ const ExportImportComponent = () => {
                 setRecords(response.data.records);
                 setResourceList(response.data.resourceList);
                 setSelectedRecords({});
+                setFetching(false);
             } catch (error) {
                 console.error("Erro ao buscar os recursos:", error);
             }
@@ -97,6 +102,7 @@ const ExportImportComponent = () => {
             sendNotice({ message: e.message, type: 'error' });
         }
     };
+
     return (
         <Box>
             <H1 style={{ margin: '10px 10px 0px 20px' }}>Export</H1>
@@ -153,7 +159,8 @@ const ExportImportComponent = () => {
                     <Button variant="outlined" disabled={!isExporting} onClick={handlerExportJson} >Exportar</Button>
                 </Box>
             </Box>
-            <Box variant="grey">
+            {isFetching && <Loader />}
+            {!isFetching && <Box variant="grey">
                 {records &&
                     Object.keys(records).map((resourceId) => (
                         <div key={resourceId}>
@@ -177,7 +184,7 @@ const ExportImportComponent = () => {
                                         <TableRow>
                                             <TableCell>
                                                 <CheckBox
-                                                     key={`CheckBox-records-${resourceId}-${rowIndex}`}
+                                                    key={`CheckBox-records-${resourceId}-${rowIndex}`}
                                                     checked={selectedRecords[resourceId]?.some((record) => record.params._id === params._id)}
                                                     onChange={() => handleRecordCheckBoxChange({ resourceId: rscId, params, relations })}
                                                 />
@@ -198,7 +205,7 @@ const ExportImportComponent = () => {
                             </Table>
                         </div>
                     ))}
-            </Box>
+            </Box>}
         </Box>
     );
 };
