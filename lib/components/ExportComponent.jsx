@@ -15,7 +15,8 @@ export const sortObjectByCustomOrder = (object, array) => {
         }, {});
 }
 
-const ExportComponent = ({ resource, records }) => {
+const ExportComponent = (props) => {
+    const { resource, records } = props;
     const [isFetching, setFetching] = useState();
     const [listProperties, setListProperties] = useState([]);
     const sendNotice = useNotice();
